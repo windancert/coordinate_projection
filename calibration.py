@@ -2,6 +2,9 @@ import numpy
 from PIL import Image, ImageDraw
 
 from measurements import *
+from perspective_project import *
+import scipy.optimize
+
 
 def _calculate_projection_matrix(measurements):
     N = len(measurements)
@@ -16,9 +19,29 @@ def _calculate_projection_matrix(measurements):
     print(C)
     print(P)
 
+    # least square
     M = numpy.linalg.lstsq(C, P, rcond=None)
+    M = M[0]
+    print('M '+ str(M))
 
-    print(M[0])
+    # curve fit nonleniar
+    print ("non linuear")
+
+    print(measurements)
+    set_data(measurements)
+    p0 = [M[0,0], M[0,1], 1, M[1,0], M[1,1], 1, M[2,0], M[2,1],1 , M[3,0], M[3,1], 1]
+    p0 = [2,0,0, 0,1,0, 0,0,1, 0,0,0 ]
+    # m11, m12, m13, m21, m22, m23, m31, m32, m33, tx, ty,tz
+    popt, pcov = scipy.optimize.curve_fit(perspective_residual, numpy.zeros((N,)), numpy.zeros((N,)), p0, maxfev=26000, method='trf')
+
+    
+    print('popt '+ str(popt))
+
+
+
+    print(perspective_residual(None,2,0,0, 0,1,0, 0,0,1, 0,0,0 ))
+    print(perspective_residual(None,1,0,0, 0,1,0, 0,0,1, 0,0,0 ))
+
 
     return M[0]
 
@@ -27,7 +50,7 @@ def _project_to_laser(M, x, y, z):
     return numpy.asarray(result[:,]).reshape(-1)
 
 # calibration_measurements = [front_leg_right, front_leg_left, back_leg, back_rest_right]
-calibration_measurements = [a, b, c, d, e, f, g ]
+calibration_measurements = [a, b, c, d, e, f, g ]*2
 
 M = _calculate_projection_matrix(calibration_measurements)
 

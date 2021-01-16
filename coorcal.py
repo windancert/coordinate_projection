@@ -28,8 +28,11 @@ C = numpy.matrix(real_world)
 C = numpy.hstack([C, numpy.ones((N,1))])
 P = numpy.matrix(screen)
 
+# least square
 M = numpy.linalg.lstsq(C, P, rcond=None)
 M = M[0]
+
+
 
 x, y = list(zip(*screen))
 plt.scatter(x, y, c='r')
