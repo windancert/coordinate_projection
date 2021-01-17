@@ -1,3 +1,4 @@
+import json
 import math
 
 import numpy
@@ -7,22 +8,6 @@ from measurements import *
 from projection_functions import *
 import scipy.optimize
 
-
-def _calculate_projection_parameters_lsq(measurements):
-    N = len(measurements)
-
-    real_world, screen = zip(*measurements)
-
-    C = numpy.matrix(real_world)
-    # Add extra column with ones to indicate constant offset
-    C = numpy.hstack([C, numpy.ones((N,1))])
-    P = numpy.matrix(screen)
-
-    # least square
-    M = numpy.linalg.lstsq(C, P, rcond=None)
-    M = M[0]
-
-    return M[0,0], M[1,0], M[2,0], M[0,1], M[1,1], M[2,1]
 
 def _calculate_projection_parameters_fit(measurements):
 
@@ -51,6 +36,14 @@ def _calibrate(calibration_measurements):
     print(numpy.max(numpy.sqrt(numpy.sum(numpy.power(screen-linear_screen, 2), axis=1))))
     return parameters
 
+
+def draw_coor(draw, Px, Py, str):
+        draw.line([(Px, Py-1), (Px, Py+15)], fill="#00FF00", width=3)
+        draw.line([(Px-15, Py), (Px+15, Py)], fill="#00FF00", width=3)
+        font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf",  30)  
+        draw.text((Px, Py), str, font = font, align ="left")  
+
+
 def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements):
     print(f"Evaluation for {filename_postfix}")
 
@@ -68,15 +61,19 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
             draw = ImageDraw.Draw(im)
             for world, screen in measurements:
                 x, y = project_to_screen_with_perspective(*world, M)
-                draw.line([(x, y-5), (x, y+5)], fill="#00FF00", width=1)
-                draw.line([(x-5, y), (x+5, y)], fill="#00FF00", width=1)
+                draw_coor(draw, x , y, ""+str(x) + " " + str(y))
+
+            test_world_coord = (90, 90, 22)
+            x, y = project_to_screen_with_perspective(*test_world_coord, M)
+            print("x,y : " + str(x) + " " + str(y) )
+            draw_coor(draw, x , y, str(test_world_coord) +":(" +str(x) + "," + str(y)+")")
 
             # write to stdout
             im.save(f"{filename_base}_{filename_postfix}.png")
 
 # 3D geprint doosje
 calibration_measurements = doosje_allemaal[:-1]
-verification_measurements = doosje_allemaal[-1:]
+verification_measurements = doosje_allemaal[:]
 filename = "led_doosje"
 
 # # Stoel
@@ -93,6 +90,16 @@ filename = "led_doosje"
 
 parameters = _calibrate(calibration_measurements)
 M = ensure_matrix(*parameters)
+
+with open("calibration_matrix.json", 'w', encoding='utf-8') as json_file:
+    # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
+    json_data = dict(zip("mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz".split(", "), parameters.tolist()))
+    json.dump(json_data, json_file, ensure_ascii=False, indent=4)
+
+with open("calibration_matrix.txt", 'w', encoding='utf-8') as data_file:
+    for parameter in parameters :
+        data_file.write(str(parameter) + '\n')
+
 _evaluate_and_write_result(filename, 'calibration', M, calibration_measurements)
 _evaluate_and_write_result(filename, 'verification', M, verification_measurements)
 

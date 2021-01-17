@@ -39,3 +39,4 @@ def _project(x, y, z, M, include_perspective):
         screen_coordinates_as_array = screen_coordinates_as_array / screen_coordinates_as_array[3]
     coordinates_xy_only = screen_coordinates_as_array[:2]
     return coordinates_xy_only.tolist()
+

@@ -5,3 +5,5 @@ led_doosje_verification.png
 projection_matrix.npy
 backup
 __pycache__
+calibration_matrix.json
+calibration_matrix.txt
