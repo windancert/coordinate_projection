@@ -56,6 +56,12 @@ M = _calculate_projection_matrix(calibration_measurements)
 
 numpy.save("projection_matrix.npy", M, allow_pickle=False)
 
+def draw_coor(draw, Px, Py, str):
+        draw.line([(Px, Py-1), (Px, Py+15)], fill="#00FF00", width=3)
+        draw.line([(Px-15, Py), (Px+15, Py)], fill="#00FF00", width=3)
+        font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf",  30)  
+        draw.text((Px, Py), str, font = font, align ="left")  
+
 with Image.open("led_doosje.png") as im:
     
     draw = ImageDraw.Draw(im)
@@ -64,10 +70,11 @@ with Image.open("led_doosje.png") as im:
         calibrated = _project_to_laser(M, *real_world)
         x = int(calibrated[0])
         y = int(calibrated[1])
-        
-        draw.line([(x, y-5), (x, y+5)], fill="#00FF00", width=1)
-        draw.line([(x-5, y), (x+5, y)], fill="#00FF00", width=1)
 
+        draw_coor(draw, x, y, "I:"+str(real_world+str(screen)+";C:"+str(calibrated)))
+
+    im.show()
+    
     # write to stdout
     im.save("led_doosje_calibration.png")
 
