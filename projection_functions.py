@@ -2,7 +2,7 @@ import numpy
 
 perspective_matrix = numpy.matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, -1], [0, 0, 0, 0]])
 
-def linearize_screen_coordinates(screen_coordinates_as_matrix):
+def flatten_screen_coordinates(screen_coordinates_as_matrix):
     return screen_coordinates_as_matrix.flatten()
 
 # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
@@ -29,7 +29,7 @@ def project_to_screen_with_perspective_multi(coordinates, *args):
     M = ensure_matrix(*args)
     result = [project_to_screen_with_perspective(x,y,z, M) for x,y,z in coordinates]
     stacked = numpy.vstack(result)
-    return linearize_screen_coordinates(stacked)
+    return stacked
 
 def _project(x, y, z, M, include_perspective):
     camera_coordinates =  numpy.matrix([x, y, z, 1]) @ M

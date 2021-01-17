@@ -1,3 +1,5 @@
+import math
+
 import numpy
 from PIL import Image, ImageDraw, ImageFont
 
@@ -28,49 +30,70 @@ def _calculate_projection_parameters_fit(measurements):
 
     real_world = numpy.vstack(real_world)
     screen = numpy.vstack(screen)
-    screen = linearize_screen_coordinates(screen)
+    flattened_screen = flatten_screen_coordinates(screen)
 
-    p0 = 2, 0, 0, 0, 2, 0, 0, 0, 2, 1, 4, 8
-    p, cov = scipy.optimize.curve_fit(project_to_screen_with_perspective_multi, real_world, screen, p0)
+    p0 = [1]*12
+    flattened_projection = lambda *args : flatten_screen_coordinates(project_to_screen_with_perspective_multi(*args)) 
+    p, cov = scipy.optimize.curve_fit(flattened_projection, real_world, flattened_screen, p0)
 
     return p
 
-# calibration_measurements = [front_leg_right, front_leg_left, back_leg, back_rest_right]
-calibration_measurements = [a, b, c, d, e, f, g]*2
+def _calibrate(calibration_measurements):
+    parameters = _calculate_projection_parameters_fit(calibration_measurements*2)
 
-parameters = _calculate_projection_parameters_lsq(calibration_measurements)
+    real_world, screen = zip(*calibration_measurements)
+    real_world = numpy.vstack(real_world)
+    screen = numpy.vstack(screen)
+    linear_screen = project_to_screen_with_perspective_multi(real_world, *parameters)
+    linear_screen = numpy.reshape(linear_screen, (len(calibration_measurements), 2))
+    print(screen)
+    print(linear_screen)
+    print(numpy.max(numpy.sqrt(numpy.sum(numpy.power(screen-linear_screen, 2), axis=1))))
+    return parameters
 
-parameters = _calculate_projection_parameters_fit(calibration_measurements)
+def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements):
+    print(f"Evaluation for {filename_postfix}")
 
+    for world, screen in measurements:
+        x, y = project_to_screen_with_perspective(*world, M)
+        
+        dx = x - screen[0]
+        dy = y - screen[1]
+        residual = math.sqrt(dx**2+dy**2)
+        print(f"({screen[0]}, {screen[1]}) ==> ({x}, {y}) ; ||.|| = {residual}")
 
-real_world, screen = zip(*calibration_measurements)
-real_world = numpy.vstack(real_world)
-screen = numpy.vstack(screen)
-linear_screen = project_to_screen_with_perspective_multi(real_world, *parameters)
-linear_screen = numpy.reshape(linear_screen, (len(calibration_measurements), 2))
-print(screen)
-print(linear_screen)
+    if filename is not None:
+        with Image.open(f"{filename_base}.png") as im:
+        
+            draw = ImageDraw.Draw(im)
+            for world, screen in measurements:
+                x, y = project_to_screen_with_perspective(*world, M)
+                draw.line([(x, y-5), (x, y+5)], fill="#00FF00", width=1)
+                draw.line([(x-5, y), (x+5, y)], fill="#00FF00", width=1)
 
+            # write to stdout
+            im.save(f"{filename_base}_{filename_postfix}.png")
 
-# numpy.save("projection_matrix.npy", M, allow_pickle=False)
+# 3D geprint doosje
+calibration_measurements = doosje_allemaal[:-1]
+verification_measurements = doosje_allemaal[-1:]
+filename = "led_doosje"
 
-def draw_coor(draw, Px, Py, str):
-        draw.line([(Px, Py-1), (Px, Py+15)], fill="#00FF00", width=3)
-        draw.line([(Px-15, Py), (Px+15, Py)], fill="#00FF00", width=3)
-        font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf",  30)  
-        draw.text((Px, Py), str, font = font, align ="left")  
+# # Stoel
+# calibration_measurements = stoel_allemaal
+# verification_measurements = stoel_allemaal
+# filename = "stoel_met_coordinaten"
 
+# # Zelf bedachte coordinaten
+# calibration_measurements = perspectief_allemaal
+# verification_measurements = perspectief_allemaal
+# filename = None
 
-with Image.open("led_doosje.png") as im:
-    
-    draw = ImageDraw.Draw(im)
-    for x,y in linear_screen:
+# parameters = _calculate_projection_parameters_lsq(calibration_measurements)
 
-        draw_coor(draw, x, y, "I:"+str(x)+","+str(y))
-   
+parameters = _calibrate(calibration_measurements)
+M = ensure_matrix(*parameters)
+_evaluate_and_write_result(filename, 'calibration', M, calibration_measurements)
+_evaluate_and_write_result(filename, 'verification', M, verification_measurements)
 
-    im.show()
-
-    # write to stdout
-    im.save("led_doosje_calibration.png")
 
