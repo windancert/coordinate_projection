@@ -8,6 +8,8 @@ from measurements import *
 from projection_functions import *
 import scipy.optimize
 
+from plot_measurement import plot_measurement
+
 
 def _calculate_projection_parameters_fit(measurements):
 
@@ -35,7 +37,6 @@ def _calibrate(calibration_measurements):
     print(linear_screen)
     print(numpy.max(numpy.sqrt(numpy.sum(numpy.power(screen-linear_screen, 2), axis=1))))
     return parameters
-
 
 def draw_coor(draw, Px, Py, str):
         draw.line([(Px, Py-1), (Px, Py+15)], fill="#00FF00", width=3)
@@ -72,9 +73,9 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
             im.save(f"{filename_base}_{filename_postfix}.png")
 
 # 3D geprint doosje
-calibration_measurements = doosje_allemaal[:-1]
-verification_measurements = doosje_allemaal[:]
-filename = "led_doosje"
+# calibration_measurements = doosje_allemaal[:-1]
+# verification_measurements = doosje_allemaal[:]
+# filename = "led_doosje"
 
 # # Stoel
 # calibration_measurements = stoel_allemaal
@@ -88,8 +89,13 @@ filename = "led_doosje"
 
 # parameters = _calculate_projection_parameters_lsq(calibration_measurements)
 
+calibration_measurements = doosje_allemaal[:]
+verification_measurements = doosje_allemaal[:]
+filename = None
+
 parameters = _calibrate(calibration_measurements)
 M = ensure_matrix(*parameters)
+
 
 with open("calibration_matrix.json", 'w', encoding='utf-8') as json_file:
     # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
@@ -101,6 +107,16 @@ with open("calibration_matrix.txt", 'w', encoding='utf-8') as data_file:
         data_file.write(str(parameter) + '\n')
 
 _evaluate_and_write_result(filename, 'calibration', M, calibration_measurements)
-_evaluate_and_write_result(filename, 'verification', M, verification_measurements)
+# _evaluate_and_write_result(filename, 'verification', M, verification_measurements)
 
+plot_measurement(calibration_measurements)
+
+world_coordinates = [m[0] for m in calibration_measurements]
+laser = [m[1] for m in calibration_measurements]
+print(world_coordinates)
+projected = [project_to_screen_with_perspective(*world, M) for world in world_coordinates]
+print(laser)
+print(projected)
+
+plot_measurement(zip(world_coordinates, projected), True)
 

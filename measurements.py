@@ -219,34 +219,6 @@ measurement_12 = (( wereld["12"]["x"],  wereld["12"]["y"],  wereld["12"]["z"]), 
 all_measurements_goed = [measurement_1, measurement_2, measurement_3, measurement_4, measurement_5, measurement_6, measurement_7, measurement_8,measurement_9,
         measurement_10,measurement_11,measurement_12  ]
 
-real_world, screen = zip(*all_measurements_goed)
-real_world = numpy.vstack(real_world)
-screen     = numpy.vstack(screen)
-
-X = numpy.zeros(len(real_world))
-Y = numpy.zeros(len(real_world))
-Z = numpy.zeros(len(real_world))
-i = 0
-for rw in real_world:
-    X[i] = rw[0]
-    Y[i] = rw[1]
-    Z[i] = rw[2]
-    i += 1
-
-Sx = numpy.zeros(len(screen))
-Sy = numpy.zeros(len(screen))
-i = 0
-for sc in screen:
-    Sx[i] = sc[0]
-    Sy[i] = sc[1]
- 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-fig1 = plt.figure()
-ax1 = fig1.add_subplot(111, projection='3d')
-ax1.scatter(X, Y, Z, zdir='z', c= 'red')
-plt.savefig("goedworld.png")
-
   
 measurement_1 = (( wereld["1"]["x"],  wereld["1"]["y"],  wereld["1"]["z"]), (fout["1"]["x"], fout["1"]["y"]))
 measurement_2 = (( wereld["2"]["x"],  wereld["2"]["y"],  wereld["2"]["z"]), (fout["2"]["x"], fout["2"]["y"]))
@@ -256,16 +228,12 @@ measurement_5 = (( wereld["5"]["x"],  wereld["5"]["y"],  wereld["5"]["z"]), (fou
 measurement_6 = (( wereld["6"]["x"],  wereld["6"]["y"],  wereld["6"]["z"]), (fout["6"]["x"], fout["6"]["y"]))
 measurement_7 = (( wereld["7"]["x"],  wereld["7"]["y"],  wereld["7"]["z"]), (fout["7"]["x"], fout["7"]["y"]))
 measurement_8 = (( wereld["8"]["x"],  wereld["8"]["y"],  wereld["8"]["z"]), (fout["8"]["x"], fout["8"]["y"]))
-measurement_1 = (( wereld["9"]["x"],  wereld["9"]["y"],  wereld["9"]["z"]), (fout["9"]["x"], fout["9"]["y"]))
-measurement_2 = (( wereld["10"]["x"],  wereld["10"]["y"],  wereld["10"]["z"]), (fout["10"]["x"], fout["10"]["y"]))
-measurement_1 = (( wereld["11"]["x"],  wereld["11"]["y"],  wereld["11"]["z"]), (fout["11"]["x"], fout["11"]["y"]))
-measurement_2 = (( wereld["12"]["x"],  wereld["12"]["y"],  wereld["12"]["z"]), (fout["12"]["x"], fout["12"]["y"]))
+measurement_9 = (( wereld["9"]["x"],  wereld["9"]["y"],  wereld["9"]["z"]), (fout["9"]["x"], fout["9"]["y"] + 0.5))
+measurement_10 = (( wereld["10"]["x"],  wereld["10"]["y"],  wereld["10"]["z"]), (fout["10"]["x"], fout["10"]["y"]))
+measurement_11 = (( wereld["11"]["x"],  wereld["11"]["y"],  wereld["11"]["z"]), (fout["11"]["x"], fout["11"]["y"]))
+measurement_12 = (( wereld["12"]["x"],  wereld["12"]["y"],  wereld["12"]["z"]), (fout["12"]["x"], fout["12"]["y"]))
 all_measurements_fout = [measurement_1, measurement_2, measurement_3, measurement_4, measurement_5, measurement_6, measurement_7, measurement_8,measurement_9,
         measurement_10,measurement_11,measurement_12]
-real_world, screen = zip(*all_measurements_fout)
-screen = numpy.vstack(screen)
-print("fout" )
-for s  in screen : 
-    print(str(s[0]) + "," + str(s[1]))
+
 
 
