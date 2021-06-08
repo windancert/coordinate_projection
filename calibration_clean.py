@@ -46,7 +46,7 @@ def draw_coor(draw, Px, Py, str):
 
 
 def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements):
-    print(f"Evaluation for {filename_postfix}")
+    #print(f"Evaluation for {filename_postfix}")
 
     for world, screen in measurements:
         x, y = project_to_screen_with_perspective(*world, M)
@@ -54,11 +54,12 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
         dx = x - screen[0]
         dy = y - screen[1]
         residual = math.sqrt(dx**2+dy**2)
-        print(f"({screen[0]}, {screen[1]}) ==> ({x}, {y}) ; ||.|| = {residual}")
+        # print(f"({screen[0]}, {screen[1]}) ==> ({x}, {y}) ; ||.|| = {residual}")
 
-    if filename is not None:
-        with Image.open(f"{filename_base}.png") as im:
-        
+    if filename_base is not None:
+        filename = filename_base+"png"
+        # with Image.open(f"{filename_base}.png") as im:
+        with Image.open(filename) as im:
             draw = ImageDraw.Draw(im)
             for world, screen in measurements:
                 x, y = project_to_screen_with_perspective(*world, M)
@@ -70,7 +71,9 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
             draw_coor(draw, x , y, str(test_world_coord) +":(" +str(x) + "," + str(y)+")")
 
             # write to stdout
-            im.save(f"{filename_base}_{filename_postfix}.png")
+            outfile = filename_base + "_" + filename_postfix + ".png"
+            # im.save(f"{filename_base}_{filename_postfix}.png")
+            im.save(outfile)
 
 # 3D geprint doosje
 # calibration_measurements = doosje_allemaal[:-1]
