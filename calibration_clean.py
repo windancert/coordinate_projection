@@ -10,8 +10,9 @@ import scipy.optimize
 
 from plot_measurement import plot_measurement
 
+PARAMETER_LIST = ["mxx", "myx", "mzx", "mxy", "myy", "mzy", "mxz", "myz", "mzz", "tx", "ty", "tz"]
 
-def _calculate_projection_parameters_fit(measurements):
+def _calculate_projection_parameters_fit(measurements, p0=None):
 
     real_world, screen = zip(*measurements)
 
@@ -19,14 +20,21 @@ def _calculate_projection_parameters_fit(measurements):
     screen = numpy.vstack(screen)
     flattened_screen = flatten_screen_coordinates(screen)
 
-    p0 = [1]*12
+    if p0 is None:
+        p0 = [1]*12
+
     flattened_projection = lambda *args : flatten_screen_coordinates(project_to_screen_with_perspective_multi(*args)) 
     p, cov = scipy.optimize.curve_fit(flattened_projection, real_world, flattened_screen, p0)
 
     return p
 
-def _calibrate(calibration_measurements):
-    parameters = _calculate_projection_parameters_fit(calibration_measurements*2)
+def _calibrate(calibration_measurements, file_with_parameters=None):
+    initial = None
+    if file_with_parameters is not None:
+        with open(file_with_parameters, 'r') as f:
+            ps = json.load(f)
+            initial = [ps[k] for k in PARAMETER_LIST]
+    parameters = _calculate_projection_parameters_fit(calibration_measurements*2, initial)
 
     real_world, screen = zip(*calibration_measurements)
     real_world = numpy.vstack(real_world)
@@ -35,6 +43,7 @@ def _calibrate(calibration_measurements):
     linear_screen = numpy.reshape(linear_screen, (len(calibration_measurements), 2))
     print(screen)
     print(linear_screen)
+    print("Residual")
     print(numpy.max(numpy.sqrt(numpy.sum(numpy.power(screen-linear_screen, 2), axis=1))))
     return parameters
 
@@ -96,34 +105,42 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
 # verification_measurements = doosje_allemaal[:]
 # filename = None
 
-calibration_measurements = all_measurements_more
-verification_measurements = all_measurements_more
+# calibration_measurements = all_measurements_more
+# verification_measurements = all_measurements_more
 filename = None
 
-parameters = _calibrate(calibration_measurements)
-M = ensure_matrix(*parameters)
+measurement_sets = [all_measurements_goed, all_measurements_fout, all_measurements_more_0, all_measurements_more_1, all_measurements_more_2]
 
+for initial_measurement_set in measurement_sets:
 
-with open("calibration_matrix.json", 'w', encoding='utf-8') as json_file:
-    # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
-    json_data = dict(zip("mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz".split(", "), parameters.tolist()))
-    json.dump(json_data, json_file, ensure_ascii=False, indent=4)
+    parameters = _calibrate(initial_measurement_set, "calibration_matrix.json")
+    M = ensure_matrix(*parameters)
 
-with open("calibration_matrix.txt", 'w', encoding='utf-8') as data_file:
-    for parameter in parameters :
-        data_file.write(str(parameter) + '\n')
+    with open("calibration_matrix.json", 'w', encoding='utf-8') as json_file:
+        # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
+        json_data = dict(zip("mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz".split(", "), parameters.tolist()))
+        json.dump(json_data, json_file, ensure_ascii=False, indent=4)
 
-_evaluate_and_write_result(filename, 'calibration', M, calibration_measurements)
-# _evaluate_and_write_result(filename, 'verification', M, verification_measurements)
+    for final_measurement_set in measurement_sets:
 
-plot_measurement(calibration_measurements)
+        parameters = _calibrate(final_measurement_set, "calibration_matrix.json")
+        M = ensure_matrix(*parameters)
 
-world_coordinates = [m[0] for m in calibration_measurements]
-laser = [m[1] for m in calibration_measurements]
-print(world_coordinates)
-projected = [project_to_screen_with_perspective(*world, M) for world in world_coordinates]
-print(laser)
-print(projected)
+        with open("calibration_matrix.txt", 'w', encoding='utf-8') as data_file:
+            for parameter in parameters :
+                data_file.write(str(parameter) + '\n')
 
-plot_measurement(zip(world_coordinates, projected), True)
+        _evaluate_and_write_result(filename, 'calibration', M, final_measurement_set)
+        # _evaluate_and_write_result(filename, 'verification', M, verification_measurements)
+
+        # plot_measurement(calibration_measurements)
+
+        world_coordinates = [m[0] for m in final_measurement_set]
+        laser = [m[1] for m in final_measurement_set]
+        print(world_coordinates)
+        projected = [project_to_screen_with_perspective(*world, M) for world in world_coordinates]
+        print(laser)
+        print(projected)
+
+        plot_measurement(zip(world_coordinates, projected), True)
 

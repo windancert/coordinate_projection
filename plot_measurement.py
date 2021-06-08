@@ -1,7 +1,13 @@
 
+from projection_functions import project_to_screen_with_perspective
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy
+
+def plot_measurement_with_evaluation(measurement, M, block=False):
+    world_coordinates = [m[0] for m in measurement]
+    projected = [project_to_screen_with_perspective(*world, M) for world in world_coordinates]
+    plot_measurement(zip(world_coordinates, projected), block)
 
 def plot_measurement(measurements, block=False):
     real_world, screen = zip(*measurements)
