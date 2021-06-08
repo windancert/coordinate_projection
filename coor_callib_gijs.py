@@ -36,7 +36,7 @@ def _calibrate(calibration_measurements, initial_guess=None):
     linear_screen = project_to_screen_with_perspective_multi(real_world, *parameters)
     linear_screen = numpy.reshape(linear_screen, (len(calibration_measurements), 2))
     residual = numpy.max(numpy.sqrt(numpy.sum(numpy.power(screen-linear_screen, 2), axis=1)))
-    print(f"Residual = {residual}")
+    print("residual = {}".format(residual))
     return parameters
 
 def load_measurements_from_files(real_world_file, screen_file):
