@@ -1,3 +1,4 @@
+import json
 import numpy
 
 # # Coordinaten stoel
@@ -34,6 +35,10 @@ perspectief_f = ((0,2,2),(0, 1))
 perspectief_g = ((1,0,4),(0.25, 0))
 
 perspectief_allemaal = [perspectief_a, perspectief_b, perspectief_c, perspectief_d, perspectief_e, perspectief_f, perspectief_g]
+
+def convert_measurements(real_world, screen):
+    indices = set(real_world.keys()).intersection(screen.keys())
+    return [((real_world[i]['x'], real_world[i]['y'], real_world[i]['z']), (screen[i]['x'], screen[i]['y'])) for i in indices]
 
 # testen van gijs.
 
@@ -237,3 +242,10 @@ all_measurements_fout = [measurement_1, measurement_2, measurement_3, measuremen
 
 
 
+with open(r'data/2021.jun.calib-raw1.txt', 'r') as f:
+  screen = json.load(f)
+
+with open(r'data/2021.jun.calib-world1.txt', 'r') as f:
+  real_world = json.load(f)
+
+all_measurements_more = convert_measurements(real_world, screen)

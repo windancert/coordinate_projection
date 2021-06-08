@@ -92,8 +92,12 @@ def _evaluate_and_write_result(filename_base, filename_postfix, M, measurements)
 
 # parameters = _calculate_projection_parameters_lsq(calibration_measurements)
 
-calibration_measurements = doosje_allemaal[:]
-verification_measurements = doosje_allemaal[:]
+# calibration_measurements = doosje_allemaal[:]
+# verification_measurements = doosje_allemaal[:]
+# filename = None
+
+calibration_measurements = all_measurements_more
+verification_measurements = all_measurements_more
 filename = None
 
 parameters = _calibrate(calibration_measurements)
