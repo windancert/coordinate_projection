@@ -58,7 +58,7 @@ def load_initial_guess_from_file(initial_guess_file):
 def run_measurement_set(screen_file, real_world_file, output_file):
     all_measurements = load_measurements_from_files(os.getcwd()+real_world_file, 
                                                     os.getcwd()+screen_file)
-    # GIJS : directory/file initial guess
+    # GIJS : directory/file initial guess data
     # initial_guess = load_initial_guess_from_file(os.getcwd()+'\data\configuration\laser\initial_guess0.json')
     initial_guess = load_initial_guess_from_file(os.getcwd()+'\initial_guess.json')
     
