@@ -15,7 +15,7 @@ def ensure_matrix(*args):
         return M
 
 def convert_matrix_to_parameters(M):
-    return M[0,0], m[0,1], m[0,2], M[1,0], M[1,1], M[1,2], M[2,0], M[2,1], M[2,2], M[3,0], M[3,1], M[3,2]
+    return M[0,0], M[0,1], M[0,2], M[1,0], M[1,1], M[1,2], M[2,0], M[2,1], M[2,2], M[3,0], M[3,1], M[3,2]
 
 def project_to_screen_with_perspective(x, y, z, *args):
     M = ensure_matrix(*args)
@@ -27,7 +27,7 @@ def project_to_screen_without_perspective(x, y, z, *args):
 
 def project_to_screen_with_perspective_multi(coordinates, *args):
     M = ensure_matrix(*args)
-    result = [project_to_screen_with_perspective(x,y,z, M) for x,y,z in coordinates]
+    result = [_project(x,y,z, M, True) for x,y,z in coordinates]
     stacked = numpy.vstack(result)
     return stacked
 

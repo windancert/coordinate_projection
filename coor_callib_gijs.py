@@ -14,7 +14,6 @@ PARAMETER_LIST = ["mxx", "myx", "mzx", "mxy", "myy", "mzy", "mxz", "myz", "mzz",
 def _calculate_projection_parameters_fit(measurements, initial_guess=None):
 
     real_world, screen = zip(*measurements)
-
     real_world = numpy.vstack(real_world)
     screen = numpy.vstack(screen)
     flattened_screen = flatten_screen_coordinates(screen)
@@ -23,12 +22,14 @@ def _calculate_projection_parameters_fit(measurements, initial_guess=None):
         initial_guess = [1]*12
 
     flattened_projection = lambda *args : flatten_screen_coordinates(project_to_screen_with_perspective_multi(*args)) 
+    print("real_world "+ str(real_world))
+    print("screen "+ str(flattened_screen))
     p, cov = scipy.optimize.curve_fit(flattened_projection, real_world, flattened_screen, initial_guess)
 
     return p
 
 def _calibrate(calibration_measurements, initial_guess=None):
-    parameters = _calculate_projection_parameters_fit(calibration_measurements*2, initial_guess)
+    parameters = _calculate_projection_parameters_fit(calibration_measurements, initial_guess)  # there was her cal_meas*2, but I didn't understand : remove
 
     real_world, screen = zip(*calibration_measurements)
     real_world = numpy.vstack(real_world)
