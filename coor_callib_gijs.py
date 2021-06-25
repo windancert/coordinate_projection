@@ -68,16 +68,22 @@ def run_measurement_set(screen_file, real_world_file, output_file):
     parameters = _calibrate(calibration_measurements, initial_guess)
     M = ensure_matrix(*parameters)
 
-    with open(os.getcwd()+output_file, 'w', encoding='utf-8') as json_file:
+    with open(os.getcwd()+output_file+".json", 'w', encoding='utf-8') as json_file:
         # mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz
         json_data = dict(zip("mxx, myx, mzx, mxy, myy, mzy, mxz, myz, mzz, tx, ty, tz".split(", "), parameters.tolist()))
         json.dump(json_data, json_file, ensure_ascii=False, indent=4)
 
+    with open(os.getcwd()+output_file+".txt", 'w', encoding='utf-8') as data_file:
+        for parameter in parameters :
+            data_file.write(str(parameter) + '\n')
+
     plot_measurement_with_evaluation(calibration_measurements, M, True)
 
 # GIJS : directory/file IN/OUT data
-run_measurement_set(r'\data\2021.jun.calib-raw2.txt', r'\data\2021.jun.calib-world2.txt', r"\output.json")
-# run_measurement_set(r'\data\configuration\laser\calib-raw0.json', r'\data\configuration\laser\CoordsBox0.json', r"\data\configuration\laser\calibMatrixCalculated0.json")
-# run_measurement_set(r'\data\configuration\laser\calib-raw1.json', r'\data\configuration\laser\CoordsBox1.json', r"\data\configuration\laser\calibMatrixCalculated1.json")
-# run_measurement_set(r'\data\configuration\laser\calib-raw2.json', r'\data\configuration\laser\CoordsBox2.json', r"\data\configuration\laser\calibMatrixCalculated2.json")
+run_measurement_set(r'\data\2021.jun.calib-raw0.txt', r'\data\2021.jun.calib-world0.txt', r"\data\021.jun.calibMatrixCalculated0")
+run_measurement_set(r'\data\2021.jun.calib-raw1.txt', r'\data\2021.jun.calib-world1.txt', r"\data\021.jun.calibMatrixCalculated1")
+run_measurement_set(r'\data\2021.jun.calib-raw2.txt', r'\data\2021.jun.calib-world2.txt', r"\data\021.jun.calibMatrixCalculated2")
+# run_measurement_set(r'\data\configuration\laser\calib-raw0.json', r'\data\configuration\laser\CoordsBox0.json', r"\data\configuration\laser\calibMatrixCalculated0")
+# run_measurement_set(r'\data\configuration\laser\calib-raw1.json', r'\data\configuration\laser\CoordsBox1.json', r"\data\configuration\laser\calibMatrixCalculated1")
+# run_measurement_set(r'\data\configuration\laser\calib-raw2.json', r'\data\configuration\laser\CoordsBox2.json', r"\data\configuration\laser\calibMatrixCalculated2")
 
