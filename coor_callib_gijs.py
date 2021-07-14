@@ -80,9 +80,12 @@ def run_measurement_set(screen_file, real_world_file, output_file):
     plot_measurement_with_evaluation(calibration_measurements, M, True)
 
 # GIJS : directory/file IN/OUT data
-run_measurement_set(r'\data\2021.jun.calib-raw0.txt', r'\data\2021.jun.calib-world0.txt', r"\data\021.jun.calibMatrixCalculated0")
-run_measurement_set(r'\data\2021.jun.calib-raw1.txt', r'\data\2021.jun.calib-world1.txt', r"\data\021.jun.calibMatrixCalculated1")
-run_measurement_set(r'\data\2021.jun.calib-raw2.txt', r'\data\2021.jun.calib-world2.txt', r"\data\021.jun.calibMatrixCalculated2")
+run_measurement_set(r'\data\2021.jul.14.calib-raw0.json', r'\data\2021.jul.14.CoordsBox_active.json', r"\data\2021.jul.14.calibMatrixCalculated0")
+
+# run_measurement_set(r'\data\2021.jun.calib-raw0.txt', r'\data\2021.jun.calib-world0.txt', r"\data\021.jun.calibMatrixCalculated0")
+# run_measurement_set(r'\data\2021.jun.calib-raw1.txt', r'\data\2021.jun.calib-world1.txt', r"\data\021.jun.calibMatrixCalculated1")
+# run_measurement_set(r'\data\2021.jun.calib-raw2.txt', r'\data\2021.jun.calib-world2.txt', r"\data\021.jun.calibMatrixCalculated2")
+
 # run_measurement_set(r'\data\configuration\laser\calib-raw0.json', r'\data\configuration\laser\CoordsBox0.json', r"\data\configuration\laser\calibMatrixCalculated0")
 # run_measurement_set(r'\data\configuration\laser\calib-raw1.json', r'\data\configuration\laser\CoordsBox1.json', r"\data\configuration\laser\calibMatrixCalculated1")
 # run_measurement_set(r'\data\configuration\laser\calib-raw2.json', r'\data\configuration\laser\CoordsBox2.json', r"\data\configuration\laser\calibMatrixCalculated2")

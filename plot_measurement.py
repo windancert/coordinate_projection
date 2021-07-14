@@ -33,11 +33,17 @@ def plot_measurement(measurements, block=False):
     ax1 = fig1.add_subplot(211, projection='3d')
     ax1.scatter(X, Y, Z, zdir='z', c= 'red')
     for i in range(len(X)):
-        ax1.text(X[i], Y[i], Z[i], i)
+        ax1.text(X[i], Y[i], Z[i], i+1)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
+    ax1.set_zlabel('z')
+    
     ax2 = fig1.add_subplot(212)
     ax2.scatter(Sx, Sy, c='green')
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
     for i in range(len(Sx)):
         #ax2.annotate(i, (Sx[i], Sx[i]))
-        ax2.text(Sx[i], Sy[i], i)
+        ax2.text(Sx[i], Sy[i], i+1)
     if block:
         plt.show()
