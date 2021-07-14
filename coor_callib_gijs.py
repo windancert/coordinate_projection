@@ -45,7 +45,7 @@ def load_measurements_from_files(real_world_file, screen_file):
         real_world = json.load(f)
     with open(screen_file, 'r') as f:
         screen = json.load(f)
-    indices = set(real_world.keys()).intersection(screen.keys())
+    indices = sorted(set(real_world.keys()).intersection(screen.keys()))
     return [((real_world[i]['x'], real_world[i]['y'], real_world[i]['z']), (screen[i]['x'], screen[i]['y'])) for i in indices]
 
 def load_initial_guess_from_file(initial_guess_file):
